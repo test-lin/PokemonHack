@@ -1,5 +1,5 @@
 // BreedAblPage.cpp : 实现文件
-//
+// 种族窗口
 
 #include "stdafx.h"
 #include "PokemonRomViewer.h"
@@ -32,11 +32,11 @@ void CBreedAblPage::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CBreedAblPage, CBreedTabPage)
 	ON_CONTROL_RANGE(EN_CHANGE, IDC_BRD_HP, IDC_BRD_SDEF, OnEnChangeBrdAbl)
-	ON_BN_CLICKED(IDC_EXPORT_BRD, OnBnClickedExportBrd)
-	ON_BN_CLICKED(IDC_EXPORT_EVO, OnBnClickedExportEvo)
-	ON_BN_CLICKED(IDC_EXPORT_LEARN, OnBnClickedExportLearn)
-	ON_BN_CLICKED(IDC_EXPORT_MACHINE, OnBnClickedExportMachine)
-	ON_BN_CLICKED(IDC_EXPORT_SKILL, OnBnClickedExportSkill)
+	ON_BN_CLICKED(IDC_EXPORT_BRD, OnBnClickedExportBrd) // 种族
+	ON_BN_CLICKED(IDC_EXPORT_EVO, OnBnClickedExportEvo) // 进化条件 // TODO 异常
+	ON_BN_CLICKED(IDC_EXPORT_LEARN, OnBnClickedExportLearn) // 可学技能
+	ON_BN_CLICKED(IDC_EXPORT_MACHINE, OnBnClickedExportMachine) // 技能机
+	ON_BN_CLICKED(IDC_EXPORT_SKILL, OnBnClickedExportSkill) // 技能
 	ON_BN_CLICKED(IDC_EXPORT_INDEX, OnBnClickedExportIndex)
 	ON_STN_DBLCLK(IDC_SHOW_EXPORT_BUTTONS, OnStnDblclickShowExportButtons)
 END_MESSAGE_MAP()
@@ -150,53 +150,55 @@ void CBreedAblPage::OnBnClickedExportBrd()
 	#error UNICODE Version ONLY!
 	#endif
 
+	// 属性
 	static LPCTSTR szTypes[] =
 	{
-		L"ノーマル",	// 00
-		L"かくとう",	// 01
-		L"ひこう",		// 02
-		L"どく",		// 03
-		L"じめん",		// 04
-		L"いわ",		// 05
-		L"むし",		// 06
-		L"ゴースト",	// 07
-		L"はがね",		// 08
-		L"？？？",		// 09
-		L"ほのお",		// 0A
-		L"みず",		// 0B
-		L"くさ",		// 0C
-		L"でんき",		// 0D
-		L"エスパー",	// 0E
-		L"こおり",		// 0F
-		L"ドラゴン",	// 10
-		L"あく",		// 11
-		L"0x12",		// 12
-		L"0x13",		// 13
-		L"0x14",		// 14
-		L"0x15",		// 15
-		L"0x16",		// 16
-		L"0x17",		// 17
-		L"0x18"			// 18
+		L"普通",	// 00
+		L"格斗",	// 01
+		L"飞行",	// 02
+		L"毒",		// 03
+		L"地面",	// 04
+		L"岩石",	// 05
+		L"虫",		// 06
+		L"鬼",		// 07
+		L"钢",		// 08
+		L"？？？",	// 09
+		L"炎",		// 0A
+		L"水",		// 0B
+		L"草",		// 0C
+		L"电",		// 0D
+		L"超能",	// 0E
+		L"氷",		// 0F
+		L"龙",		// 10
+		L"恶",		// 11
+		L"0x12",	// 12
+		L"0x13",	// 13
+		L"0x14",	// 14
+		L"0x15",	// 15
+		L"0x16",	// 16
+		L"0x17",	// 17
+		L"0x18",	// 18
 	};
 
+	// 蛋组
 	static LPCTSTR szEggGroups[] =
 	{
 		L"？？？",		// 00
-		L"怪獣",		// 01
+		L"怪兽",		// 01
 		L"水中１",		// 02
 		L"虫",			// 03
-		L"飛行",		// 04
-		L"陸上",		// 05
+		L"飞行",		// 04
+		L"陆上",		// 05
 		L"妖精",		// 06
 		L"植物",		// 07
 		L"人形",		// 08
 		L"水中３",		// 09
-		L"鉱物",		// 0A
+		L"矿物",		// 0A
 		L"不定形",		// 0B
 		L"水中２",		// 0C
-		L"メタモン",	// 0D
-		L"竜",			// 0E
-		L"未発見"		// 0F
+		L"百变怪",		// 0D
+		L"龙",			// 0E
+		L"未发现"		// 0F
 	};
 
 	BOOL	bResult;
@@ -216,7 +218,7 @@ void CBreedAblPage::OnBnClickedExportBrd()
 		// create export file
 		SetCurrentDirectory(theApp.m_szInitialPath);
 		szText = rom.GetRomName();
-		szText += _T(" Breed.txt");
+		szText += _T(" 种族.csv");
 		bResult = expFile.Open(szText, CFile::modeCreate | CFile::modeWrite | CFile::shareDenyNone);
 		if(!bResult)
 			throw 0;
@@ -226,33 +228,34 @@ void CBreedAblPage::OnBnClickedExportBrd()
 
 		// write column headers
 		szText = _T("ID\t");				// 1
-		szText += _T("Kanto\t");			// 2
-		szText += _T("Houen\t");			// 3
-		szText += _T("Name\t");				// 4
-		szText += _T("HP\t");				// 5
-		szText += _T("Atk\t");				// 6
-		szText += _T("Def\t");				// 7
-		szText += _T("Dex\t");				// 8
-		szText += _T("SAtk\t");				// 9
-		szText += _T("SDef\t");				// 10
-		szText += _T("Type1\t");			// 11
-		szText += _T("Type2\t");			// 12
-		szText += _T("Spec1\t");			// 13
-		szText += _T("Spec2\t");			// 14
-		szText += _T("Egg Group1\t");		// 15
-		szText += _T("Egg Group2\t");		// 16
-		szText += _T("Catch Ratio%\t");		// 17
-		szText += _T("Escape Ratio%\t");	// 18
-		szText += _T("Init Exp\t");			// 19
-		szText += _T("Init Intimate\t");	// 20
-		szText += _T("Female Ratio%\t");	// 21
-		szText += _T("Exp Type\t");			// 22
-		szText += _T("Hatch Time\t");		// 23
+		// szText += _T("Kanto\t");			// 2
+		// szText += _T("Houen\t");			// 3
+		szText += _T("名称\t");				// 4 名称
+		szText += _T("HP\t");				// 5 血量
+		szText += _T("物攻(Atk)\t");				// 6 物攻
+		szText += _T("物防(Def)\t");				// 7 物防
+		szText += _T("速度(Dex)\t");				// 8 速度
+		szText += _T("特攻(SAtk)\t");				// 9 特攻
+		szText += _T("特防(SDef)\t");				// 10 特防
+		szText += _T("属性1(Type1)\t");			// 11 属性1
+		szText += _T("属性2(Type2)\t");			// 12 属性2
+		szText += _T("特性1(Spec1)\t");			// 13 特性1
+		szText += _T("特性2(Spec2)\t");			// 14 特性2
+		szText += _T("蛋组1(Egg Group1)\t");		// 15 蛋组1
+		szText += _T("蛋组2(Egg Group2)\t");		// 16 蛋组2
+		szText += _T("捕获度（0~255）(Catch Ratio%)\t");		// 17 捕获度（0~255）
+		szText += _T("逃亡度（0~255）(Escape Ratio%)\t");	// 18 逃亡度（0~255）
+		szText += _T("基础经验值（0~255）(Init Exp)\t");			// 19 基础经验值（0~255）
+		szText += _T("初始亲密度（0~255）(Init Intimate)\t");	// 20 初始亲密度（0~255）
+		szText += _T("性别比率（0~255）(Female Ratio%)\t");	// 21 性别比率（0~255）
+		szText += _T("经验值类型(Exp Type)\t");			// 22 经验值类型
+		szText += _T("孵蛋时间（0~255）(Hatch Time)\t");		// 23 孵蛋时间（0~255）
 		szText += _T("Drop1\t");			// 24
 		szText += _T("Drop2\r\n");			// 25
 		expFile.Write((LPCTSTR)(szText), szText.GetLength() * sizeof(TCHAR));
 
 		// format each field
+		int ui_lang = ui_lang_cn;
 		for(wBreed = 0; wBreed < BREED_COUNT; ++wBreed)
 		{
 			pBreed = rom.GetBreedListEntry(wBreed);
@@ -266,15 +269,15 @@ void CBreedAblPage::OnBnClickedExportBrd()
 			szText += szTemp;
 
 			// 2.kanto
-			szTemp.Format(_T("%hu"), rom.m_pPokedexKantoOrder[wBreed]);
-			szText = szText + _T("\t") + szTemp;
+			//szTemp.Format(_T("%hu"), rom.m_pPokedexKantoOrder[wBreed]);
+			//szText = szText + _T("\t") + szTemp;
 
 			// 3. houen
-			szTemp.Format(_T("%hu"), rom.m_pPokedexHouenOrder[wBreed]);
-			szText = szText + _T("\t") + szTemp;
+			//szTemp.Format(_T("%hu"), rom.m_pPokedexHouenOrder[wBreed]);
+			//szText = szText + _T("\t") + szTemp;
 
 			// 4.name
-			szTemp.Format(_T("%s"), cfg.pBreedNameList[wBreed].rgszText[ui_lang_jp]);
+			szTemp.Format(_T("%s"), cfg.pBreedNameList[wBreed].rgszText[ui_lang]);
 			szText = szText + _T("\t") + szTemp;
 
 			// 5.hp
@@ -311,14 +314,14 @@ void CBreedAblPage::OnBnClickedExportBrd()
 
 			// 13.spec1
 			if(pBreed->bSpecialty1)
-				szTemp.Format(_T("%s"), cfg.pSpecNameList[pBreed->bSpecialty1].rgszText[ui_lang_jp]);
+				szTemp.Format(_T("%s"), cfg.pSpecNameList[pBreed->bSpecialty1].rgszText[ui_lang]);
 			else
 				szTemp = _T("");
 			szText += _T("\t") + szTemp;
 
 			// 14.spec2
-			if(pBreed->bSpecialty2)
-				szTemp.Format(_T("%s"), cfg.pSpecNameList[pBreed->bSpecialty2].rgszText[ui_lang_jp]);
+			if (pBreed->bSpecialty2)
+				szTemp.Format(_T("%s"), cfg.pSpecNameList[pBreed->bSpecialty2].rgszText[ui_lang]);
 			else
 				szTemp = _T("");
 			szText += _T("\t") + szTemp;
@@ -375,18 +378,18 @@ void CBreedAblPage::OnBnClickedExportBrd()
 
 			// 24.drop1
 			if(pBreed->wDrop1)
-				szTemp.Format(_T("%s"), cfg.pItemNameList[pBreed->wDrop1].rgszText[ui_lang_jp]);
+				szTemp.Format(_T("%s"), cfg.pItemNameList[pBreed->wDrop1].rgszText[ui_lang]);
 			else
 				szTemp = _T("");
 			szText += _T("\t") + szTemp;
 
 			// 25.drop2
-			if(pBreed->wDrop2)
-				szTemp.Format(_T("%s"), cfg.pItemNameList[pBreed->wDrop2].rgszText[ui_lang_jp]);
+			if (pBreed->wDrop2)
+				szTemp.Format(_T("%s"), cfg.pItemNameList[pBreed->wDrop2].rgszText[ui_lang]);
 			else
 				szTemp = _T("");
 			szText += _T("\t") + szTemp;
-			
+
 			szText += _T("\r\n");
 
 			expFile.Write((LPCTSTR)(szText), szText.GetLength() * sizeof(TCHAR));
@@ -408,11 +411,11 @@ void CBreedAblPage::OnBnClickedExportBrd()
 
 	if(bResult)
 	{
-		AfxMessageBox(_T("Succeeded!"));
+		AfxMessageBox(_T("导出成功!"));
 	}
 	else
 	{
-		AfxMessageBox(_T("Failed!"));
+		AfxMessageBox(_T("导出失败!"));
 	}
 }
 
@@ -513,22 +516,22 @@ void CBreedAblPage::OnBnClickedExportEvo()
 
 	EvoConditions	rgEvoConditions[] =
 	{
-		{ L"進化不能",					L"",		evo_none },		// 00
-		{ L"なつき度220",				L"",		evo_none },		// 01
-		{ L"なつき度220、午前",			L"",		evo_none },		// 02
-		{ L"なつき度220、午後",			L"",		evo_none },		// 03
-		{ L"レベル%lu",					L"",		evo_level },	// 04
-		{ L"通信交換",					L"",		evo_none },		// 05
-		{ L"%sを持たせて通信交換",		L"",		evo_item },		// 06
-		{ L"%s",						L"",		evo_item },		// 07
-		{ L"攻撃>防御、レベル%lu",		L"",		evo_level },	// 08
-		{ L"攻撃=防御、レベル%lu",		L"",		evo_level },	// 09
-		{ L"攻撃<防御、レベル%lu",		L"",		evo_level },	// 0A
-		{ L"性格値%%10<5、レベル%lu",	L"",		evo_level },	// 0B
-		{ L"性格値%%10>4、レベル%lu",	L"",		evo_level },	// 0C
-		{ L"手持ちがあり、レベル%lu",	L"",		evo_level },	// 0D
-		{ L"手持ちがない、レベル%lu",	L"",		evo_level },	// 0E
-		{ L"美しさ%lu",					L"",		evo_beauty }	// 0F
+		{ L"不能进化",					L"没有参数",		evo_none },		// 00
+		{ L"亲密度达到220",			L"没有参数",		evo_none },		// 01
+		{ L"亲密度达到220，晚",		L"没有参数",		evo_none },		// 02
+		{ L"亲密度达到220，早",		L"没有参数",		evo_none },		// 03
+		{ L"升级",						L"最低等级",		evo_level },	// 04
+		{ L"通信交换",					L"没有参数",		evo_none },		// 05
+		{ L"通信交换，持有特定道具",	L"道具编号",		evo_item },		// 06
+		{ L"使用特定道具",				L"道具编号",		evo_item },		// 07
+		{ L"升级，攻击>防御",			L"最低等级",		evo_level },	// 08
+		{ L"升级，攻击=防御",			L"最低等级",		evo_level },	// 09
+		{ L"升级，攻击<防御",			L"最低等级",		evo_level },	// 0A
+		{ L"升级，性格值%10<5",		L"最低等级",		evo_level },	// 0B
+		{ L"升级，性格值%10>=5",		L"最低等级",		evo_level },	// 0C
+		{ L"升级增值进化",		L"最低等级",		evo_level },	// 0D
+		{ L"增值繁衍",			L"最低等级",		evo_level },	// 0E
+		{ L"美丽值",					L"最低美丽值",		evo_beauty }	// 0F
 	};
 
 	BOOL	bResult;
